@@ -4,28 +4,30 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"strings"
 	"unicode/utf8"
 )
 
+// Проверка длины слова
 func checkLen(word string) bool {
 	if utf8.RuneCountInString(word) != 5 {
-		fmt.Println("В слове должно быть 5 букв")
+		fmt.Printf("В слове должно быть 5 букв\n")
 		return false
 	}
 	return true
 }
 
+// Проверка языка слова (должно быть написано кириллицей)
 func checkLanguage(word string) bool {
-	re := regexp.MustCompile("[А-Яа-я]")
-	for _, letter := range word {
-		if !re.MatchString(string(letter)) {
-			fmt.Println("Слово должно быть написано русскими буквами")
-			return false
-		}
+	re := regexp.MustCompile("^[А-Яа-я]+$")
+	if !re.MatchString(word) {
+		fmt.Println("Слово должно быть написано русскими буквами")
+		return false
 	}
 	return true
 }
 
+// Проверка попытки и формирование результата
 func checkTry(word string, wordx string) []string {
 	letters := []rune(word)
 	lettersx := []rune(wordx)
@@ -62,6 +64,7 @@ func checkTry(word string, wordx string) []string {
 	return result
 }
 
+// Печать результата
 func printResult(word string, result []string) {
 	for _, letter := range word {
 		fmt.Printf("%c  ", letter)
@@ -79,10 +82,24 @@ func main() {
 		fmt.Println("Введите 5-буквенное слово на русском языке")
 		var word string
 		fmt.Scanf("%s\n", &word)
+		word = strings.ToLower(word) // Приводим слово к нижнему регистру
+
+		// Проверка длины и языка, даем возможность повторного ввода
 		if !checkLen(word) || !checkLanguage(word) {
-			break
+			fmt.Println("Попробуйте снова.")
+			try-- // Не засчитываем неудачную попытку
+			continue
 		}
+
 		result := checkTry(word, wordx)
 		printResult(word, result)
+
+		// Проверка на выигрыш
+		if strings.Join(result, "") == "🟢🟢🟢🟢🟢" {
+			fmt.Println("Поздравляем! Вы угадали слово!")
+			return
+		}
 	}
+
+	fmt.Printf("Игра окончена. Вы не угадали слово. Загаданное слово: %s\n", wordx)
 }
