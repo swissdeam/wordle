@@ -83,7 +83,7 @@ func printResult(word string, result []string) {
 func loadWords(filename string) ([]string, error) {
 	file, err := os.Open(filename)
 	if err != nil {
-		return nil, err
+		log.Fatalf("Ошибка при открытии файла: %v", err)
 	}
 	defer file.Close()
 
@@ -95,6 +95,7 @@ func loadWords(filename string) ([]string, error) {
 			words = append(words, word)
 		}
 	}
+
 	if err := scanner.Err(); err != nil {
 		return nil, err
 	}
@@ -119,11 +120,10 @@ func isWordInList(word string, words []string) bool {
 }
 
 func main() {
-	words, err := loadWords("russian.txt")
+	words, err := loadWords("russian2.txt")
 	if err != nil {
 		log.Fatalf("Ошибка при загрузке слов: %v", err)
 	}
-	fmt.Println(words)
 	wordx := getRandomWord(words)
 	fmt.Println("Загаданное слово:", wordx)
 
