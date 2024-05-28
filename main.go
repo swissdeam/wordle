@@ -1,10 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
+	"math/rand"
+	"os"
 	"regexp"
 	"strings"
+	"time"
 	"unicode/utf8"
 )
 
@@ -76,15 +80,60 @@ func printResult(word string, result []string) {
 	fmt.Println()
 }
 
+func loadWords(filename string) ([]string, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var words []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		word := scanner.Text()
+		if utf8.RuneCountInString(word) == 5 {
+			words = append(words, word)
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return words, nil
+}
+
+func getRandomWord(words []string) string {
+
+	source := rand.NewSource(time.Now().UnixNano())
+	rng := rand.New(source)
+	return words[rng.Intn(len(words))]
+}
+
+func isWordInList(word string, words []string) bool {
+	for _, w := range words {
+		if word == w {
+			return true
+		}
+	}
+	return false
+}
+
 func main() {
-	wordx := "вссср"
+	words, err := loadWords("russian.txt")
+	if err != nil {
+		log.Fatalf("Ошибка при загрузке слов: %v", err)
+	}
+	fmt.Println(words)
+	wordx := getRandomWord(words)
+	fmt.Println("Загаданное слово:", wordx)
+
 	for try := 1; try <= 6; try++ {
 		fmt.Println("Введите 5-буквенное слово на русском языке")
 		var word string
 		fmt.Scanf("%s\n", &word)
 		word = strings.ToLower(word) // Нижний регистр
 
-		if !checkLen(word) || !checkLanguage(word) {
+		if !checkLen(word) || !checkLanguage(word) || !isWordInList(word, words) {
 			fmt.Println("Попробуйте снова.")
 			try--
 			continue
