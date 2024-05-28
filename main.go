@@ -7,62 +7,30 @@ import (
 	"unicode/utf8"
 )
 
-// Чтение слова из консоли
-// прроверка на существование введенного слова
-// проверка попытки и вывод результата
-
-// СПИСОК СЛУЧАЕВ
-// 1. нет входящих букв
-// 2. слово не на своем месте
-// 3. слово на правильном месте
-// 4. Проигрыш и вывод правильного слова
-// 5. выигрыш
-// 6. Длина больше или меньше 5 //сделано
-// 7. Проверка на язык //сделано
-
 func checkLen(word string) bool {
-	// fmt.Println(len(word)) // считаем байты
-	// fmt.Println(utf8.RuneCountInString(word)) // считаем количество символов
 	if utf8.RuneCountInString(word) != 5 {
-		fmt.Printf("В слове должно быть 5 букв")
+		fmt.Println("В слове должно быть 5 букв")
 		return false
 	}
 	return true
 }
 
 func checkLanguage(word string) bool {
-	var letters []string
-	var isRussian = true
+	re := regexp.MustCompile("[А-Яа-я]")
 	for _, letter := range word {
-		letters = append(letters, string(letter))
-	}
-
-	for _, rune := range letters {
-		re := regexp.MustCompile("[А-Яа-я]")
-		if !re.MatchString(rune) {
-			isRussian = false
-			fmt.Println("Слово должно быть русским языком написано")
-			break
+		if !re.MatchString(string(letter)) {
+			fmt.Println("Слово должно быть написано русскими буквами")
+			return false
 		}
 	}
-	return isRussian
+	return true
 }
 
 func checkTry(word string, wordx string) []string {
-	var letters []string
-	var lettersx []string
-	var result []string
-
-	for _, letter := range word {
-		letters = append(letters, string(letter))
-	}
-	log.Println(letters)
-	log.Println(lettersx)
-	for _, letterx := range wordx {
-		lettersx = append(lettersx, string(letterx))
-	}
-	result = make([]string, len(letters))
-	usedInWordx := make([]bool, len(wordx))
+	letters := []rune(word)
+	lettersx := []rune(wordx)
+	result := make([]string, len(letters))
+	usedInWordx := make([]bool, len(lettersx))
 
 	for i := 0; i < len(letters); i++ {
 		if letters[i] == lettersx[i] {
@@ -73,7 +41,7 @@ func checkTry(word string, wordx string) []string {
 
 	for i := 0; i < len(letters); i++ {
 		if result[i] == "🟢" {
-			continue 
+			continue
 		}
 
 		matched := false
@@ -94,7 +62,16 @@ func checkTry(word string, wordx string) []string {
 	return result
 }
 
-
+func printResult(word string, result []string) {
+	for _, letter := range word {
+		fmt.Printf("%c  ", letter)
+	}
+	fmt.Println()
+	for _, r := range result {
+		fmt.Printf("%s ", r)
+	}
+	fmt.Println()
+}
 
 func main() {
 	wordx := "вссср"
@@ -105,6 +82,7 @@ func main() {
 		if !checkLen(word) || !checkLanguage(word) {
 			break
 		}
-		checkTry(word, wordx)
+		result := checkTry(word, wordx)
+		printResult(word, result)
 	}
 }
