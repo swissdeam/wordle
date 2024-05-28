@@ -38,7 +38,7 @@ func checkLanguage(word string) bool {
 	}
 
 	for _, rune := range letters {
-		re := regexp.MustCompile("[А-Яа-я]") //проверяем на киррилические символы
+		re := regexp.MustCompile("[А-Яа-я]")
 		if !re.MatchString(rune) {
 			isRussian = false
 			fmt.Println("Слово должно быть русским языком написано")
@@ -52,8 +52,7 @@ func checkTry(word string, wordx string) []string {
 	var letters []string
 	var lettersx []string
 	var result []string
-	used := make(map[string]int)
-	usedx := make(map[string]int)
+
 	for _, letter := range word {
 		letters = append(letters, string(letter))
 	}
@@ -63,38 +62,42 @@ func checkTry(word string, wordx string) []string {
 		lettersx = append(lettersx, string(letterx))
 	}
 	result = make([]string, len(letters))
-	for i, rune := range letters {
-		for j, runex := range lettersx {
-			log.Println("cравниваем <<", rune, ">> на месте", i, " и <<", runex, ">> на месте", j)
-			if i == j && rune == runex {
-				result[j] = "🟢"
-				usedx[runex] = j
-				if used[runex] < i {
-					fmt.Println(used[runex], "yellow")
-					result[used[runex]] = "⚫"
-				}
-				i++
-				j = 0
-			} else if i != j && rune == runex && usedx[runex] != j {
-				result[i] = "🟡"
-				used[runex] = i
-				usedx[runex] = j
-				i++
-				j = 0
-			} else {
-				result[i] = "⚫"
-			}
-			log.Println(result, "промежуточный")
+	usedInWordx := make([]bool, len(wordx))
+
+	for i := 0; i < len(letters); i++ {
+		if letters[i] == lettersx[i] {
+			result[i] = "🟢"
+			usedInWordx[i] = true
 		}
 	}
 
-	log.Println(letters)
-	log.Println(result)
+	for i := 0; i < len(letters); i++ {
+		if result[i] == "🟢" {
+			continue 
+		}
+
+		matched := false
+		for j := 0; j < len(lettersx); j++ {
+			if letters[i] == lettersx[j] && !usedInWordx[j] {
+				result[i] = "🟡"
+				usedInWordx[j] = true
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			result[i] = "⚫"
+		}
+		log.Println(result, "промежуточный")
+	}
+
 	return result
 }
 
+
+
 func main() {
-	wordx := "сболт"
+	wordx := "вссср"
 	for try := 1; try <= 6; try++ {
 		fmt.Println("Введите 5-буквенное слово на русском языке")
 		var word string
