@@ -62,7 +62,7 @@ func checkTry(word string, wordx string) []string {
 		if !matched {
 			result[i] = "⚫"
 		}
-		log.Println(result, "промежуточный")
+		// log.Println(result, "промежуточный")
 	}
 
 	return result
