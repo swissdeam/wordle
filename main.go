@@ -104,7 +104,6 @@ func loadWords(filename string) ([]string, error) {
 }
 
 func getRandomWord(words []string) string {
-
 	source := rand.NewSource(time.Now().UnixNano())
 	rng := rand.New(source)
 	return words[rng.Intn(len(words))]
